@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Primary brand colors -->
+    <color name="md_theme_light_primary">#2196F3</color>
+    <color name="md_theme_light_onPrimary">#FFFFFF</color>
+    <color name="md_theme_light_primaryContainer">#D1E4FF</color>
+    <color name="md_theme_light_onPrimaryContainer">#001D36</color>
+
+    <!-- Secondary colors -->
+    <color name="md_theme_light_secondary">#757575</color>
+    <color name="md_theme_light_onSecondary">#FFFFFF</color>
+    <color name="md_theme_light_secondaryContainer">#E8E8E8</color>
+    <color name="md_theme_light_onSecondaryContainer">#1B1B1B</color>
+
+    <!-- State colors -->
+    <color name="md_theme_light_success">#4CAF50</color>
+    <color name="md_theme_light_onSuccess">#FFFFFF</color>
+    <color name="md_theme_light_warning">#FFC107</color>
+    <color name="md_theme_light_onWarning">#000000</color>
+    <color name="md_theme_light_error">#F44336</color>
+    <color name="md_theme_light_onError">#FFFFFF</color>
+
+    <!-- Background and surface colors -->
+    <color name="md_theme_light_background">#FFFFFF</color>
+    <color name="md_theme_light_onBackground">#000000</color>
+    <color name="md_theme_light_surface">#FFFFFF</color>
+    <color name="md_theme_light_onSurface">#000000</color>
+    <color name="md_theme_light_surfaceVariant">#F5F5F5</color>
+    <color name="md_theme_light_onSurfaceVariant">#757575</color>
+</resources>
