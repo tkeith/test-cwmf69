@@ -88,8 +88,8 @@ dependencies {
     kapt("androidx.room:room-compiler:2.5.2")
 
     // Dependency Injection - Hilt
-    implementation("com.google.dagger:hilt-android:2.47")
-    kapt("com.google.dagger:hilt-android-compiler:2.47")
+    implementation("com.google.dagger:hilt-android:2.55")
+    kapt("com.google.dagger:hilt-android-compiler:2.55")
 
     // Networking
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
