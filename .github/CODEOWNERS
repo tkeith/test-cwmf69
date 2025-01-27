@@ -1,0 +1,36 @@
+# Unless a later match takes precedence, project leads will be requested for review
+* @project-leads
+
+# Backend code ownership
+src/backend/** @backend-team
+src/backend/db/** @backend-team @database-team
+
+# Mobile app code ownership
+src/ios/** @ios-team
+src/android/** @android-team
+
+# Web frontend code ownership
+src/web/** @frontend-team
+
+# Shared code requiring architectural review
+src/shared/** @project-leads @architecture-team
+
+# Infrastructure and deployment code
+infrastructure/** @devops-team
+
+# Security-sensitive code patterns
+src/**/security/** @security-team
+src/**/auth/** @security-team @backend-team
+src/**/crypto/** @security-team
+
+# CI/CD workflows
+.github/workflows/** @devops-team
+
+# Test files
+**/test/** @qa-team
+
+# Documentation
+docs/api/** @backend-team @documentation-team
+
+# Configuration files
+config/** @devops-team @security-team
