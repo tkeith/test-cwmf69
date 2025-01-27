@@ -1,0 +1,73 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: delayed-messaging-config
+  namespace: delayed-messaging
+  labels:
+    app: delayed-messaging
+    component: backend
+    environment: production
+data:
+  # Server Settings
+  NODE_ENV: "production"
+  PORT: "3000"
+  API_VERSION: "v1"
+  HOST: "0.0.0.0"
+  TRUST_PROXY: "true"
+
+  # Database Configuration
+  DB_MAX_CONNECTIONS: "20"
+  DB_IDLE_TIMEOUT: "10000"
+  DB_CONNECTION_TIMEOUT: "5000"
+  DB_STATEMENT_TIMEOUT: "30000"
+  DB_POOL_MIN: "2"
+  DB_POOL_MAX: "20"
+
+  # Redis Configuration
+  REDIS_HOST: "delayed-messaging-redis"
+  REDIS_PORT: "6379"
+  REDIS_DB: "0"
+  REDIS_TLS_ENABLED: "true"
+  REDIS_KEY_PREFIX: "delayed_msg:"
+  REDIS_CLUSTER_ENABLED: "true"
+  REDIS_CLUSTER_NODES: "3"
+  REDIS_MAX_RETRIES: "3"
+  REDIS_RETRY_INTERVAL: "1000"
+  REDIS_KEEP_ALIVE: "true"
+
+  # WebSocket Configuration
+  WS_PING_TIMEOUT: "10000"
+  WS_PING_INTERVAL: "5000"
+  WS_MAX_BUFFER_SIZE: "1000000"
+  WS_CORS_ORIGIN: "*"
+  WS_MAX_PAYLOAD: "16384"
+  WS_BACKOFF_INITIAL: "1000"
+  WS_BACKOFF_MAX: "10000"
+  WS_HEARTBEAT_INTERVAL: "30000"
+
+  # Rate Limiting
+  RATE_LIMIT_WINDOW: "15"
+  RATE_LIMIT_MAX_REQUESTS: "100"
+  RATE_LIMIT_DELAY_MS: "0"
+  RATE_LIMIT_WHITELIST: "health,metrics"
+
+  # Logging
+  LOG_LEVEL: "info"
+  LOG_FORMAT: "json"
+  LOG_TIMESTAMP: "true"
+  LOG_COLORIZE: "false"
+  LOG_INCLUDE_TRACE: "true"
+
+  # Message Queue
+  MIN_MESSAGE_DELAY: "30"
+  MAX_MESSAGE_DELAY: "60"
+  QUEUE_PROCESSING_BATCH_SIZE: "100"
+  QUEUE_PROCESSING_INTERVAL: "1000"
+  QUEUE_MAX_RETRIES: "3"
+  QUEUE_RETRY_DELAY: "5000"
+
+  # Metrics
+  METRICS_ENABLED: "true"
+  METRICS_PREFIX: "delayed_messaging"
+  METRICS_INTERVAL: "15000"
+  METRICS_PATH: "/metrics"
