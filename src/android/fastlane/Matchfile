@@ -1,0 +1,65 @@
+# Fastlane Match configuration for Android certificate management
+# fastlane version: 2.216.0
+# fastlane-plugin-match version: 0.1.0
+
+# Import package name from Appfile for keystore naming conventions
+import_from_git(
+  url: "git@github.com:organization/certificates.git"
+)
+
+# Git repository URL for storing encrypted certificates
+git_url("git@github.com:organization/certificates.git")
+
+# Use Git-based storage for certificates and keystores
+storage_mode("git")
+
+# Platform specification for Android
+platform("android")
+
+# Certificate type based on environment (development/staging/production)
+type("development")
+
+# Enable read-only mode for CI environments to prevent unauthorized modifications
+readonly(true)
+
+# Enable verbose logging for debugging and audit trails
+verbose(true)
+
+# Disable automatic certificate generation for new devices
+force_for_new_devices(false)
+
+# Configure keystore naming based on package name
+app_identifier(package_name)
+
+# Certificate management settings
+keystore_name("#{package_name}.keystore")
+key_alias("#{package_name}_key")
+
+# Security settings for certificate operations
+encryption_key_path(ENV["MATCH_ENCRYPTION_KEY"])
+git_basic_authorization(ENV["MATCH_GIT_AUTH_TOKEN"])
+
+# Backup and rotation configuration
+backup_enabled(true)
+backup_frequency("daily")
+backup_retention_period("30")
+certificate_rotation_period("90")
+
+# Audit logging configuration
+audit_logging(true)
+audit_log_path("logs/certificate_operations.log")
+
+# Environment-specific certificate paths
+development_keystore_path("keystores/development/#{keystore_name}")
+staging_keystore_path("keystores/staging/#{keystore_name}")
+production_keystore_path("keystores/production/#{keystore_name}")
+
+# Access control settings
+readonly_git_access(true)
+require_security_scan(true)
+enforce_ssh_authentication(true)
+
+# Repository maintenance settings
+cleanup_expired_certificates(true)
+cleanup_frequency("quarterly")
+access_review_period("monthly")
