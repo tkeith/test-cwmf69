@@ -1,0 +1,126 @@
+# Datadog Agent Configuration v7.45.0
+# Core API configuration
+api_key: ${DD_API_KEY}
+site: datadoghq.com
+
+# Global settings
+hostname: delayed-messaging
+env: production
+tags:
+  - service:delayed-messaging
+  - env:production
+
+# Enable logs collection
+logs_enabled: true
+
+# APM (Application Performance Monitoring) configuration
+apm_config:
+  enabled: true
+  env: production
+  analyzed_spans:
+    delayed-messaging|message.process: 1.0
+    delayed-messaging|message.deliver: 1.0
+
+# Logs configuration
+logs_config:
+  container_collect_all: true
+  processing_rules:
+    - type: mask_sequences
+      name: mask_user_data
+      pattern: 'email=\w+@\w+\.\w+'
+
+# Metrics collection configuration
+metrics_config:
+  aggregator_stop_timeout: 4
+  forwarder_timeout: 20
+
+# Service integrations
+integrations:
+
+  # Node.js backend monitoring
+  - name: nodejs
+    init_config: {}
+    instances:
+      - url: http://backend-service:3000/metrics
+        tags:
+          - service:backend
+        metrics:
+          - message_delivery_success_rate
+          - message_processing_latency
+          - concurrent_users
+          - system_uptime
+
+  # Redis monitoring
+  - name: redis
+    init_config: {}
+    instances:
+      - host: redis-service
+        port: 6379
+        tags:
+          - service:redis
+        metrics:
+          - redis.connected_clients
+          - redis.used_memory
+          - redis.queue_length
+          - redis.operations_total
+
+  # PostgreSQL monitoring
+  - name: postgres
+    init_config: {}
+    instances:
+      - host: postgres-service
+        port: 5432
+        username: datadog
+        tags:
+          - service:postgres
+        metrics:
+          - postgresql.database_size
+          - postgresql.tup_fetched
+          - postgresql.tup_inserted
+          - postgresql.tup_updated
+
+# Monitoring alerts
+monitors:
+  # Message latency monitor
+  - name: High Message Latency
+    type: metric alert
+    query: avg(last_5m):avg:message_processing_latency{*} > 100
+    message: Message processing latency is above 100ms threshold
+    tags:
+      - severity:critical
+      - service:delayed-messaging
+    notify:
+      - "@ops-team"
+
+  # Message delivery success rate monitor
+  - name: Low Delivery Success Rate
+    type: metric alert
+    query: avg(last_5m):avg:message_delivery_success_rate{*} < 99.99
+    message: Message delivery success rate dropped below 99.99%
+    tags:
+      - severity:critical
+      - service:delayed-messaging
+    notify:
+      - "@ops-team"
+
+  # System uptime monitor
+  - name: System Uptime Alert
+    type: metric alert
+    query: avg(last_5m):avg:system_uptime{*} < 99.9
+    message: System uptime dropped below 99.9%
+    tags:
+      - severity:critical
+      - service:delayed-messaging
+    notify:
+      - "@ops-team"
+
+  # Concurrent users monitor
+  - name: High Concurrent Users
+    type: metric alert
+    query: avg(last_5m):avg:concurrent_users{*} > 10000
+    message: Number of concurrent users exceeded 10,000 limit
+    tags:
+      - severity:warning
+      - service:delayed-messaging
+    notify:
+      - "@ops-team"
