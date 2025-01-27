@@ -1,0 +1,46 @@
+# Backend Service manifest for Delayed Messaging System
+# Provides internal service discovery and load balancing for API and WebSocket endpoints
+apiVersion: v1
+kind: Service
+
+metadata:
+  name: backend-api
+  namespace: delayed-messaging
+  labels:
+    app: backend-api
+    component: api
+    environment: production
+  annotations:
+    # Prometheus monitoring configuration
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "3000"
+    prometheus.io/path: "/metrics"
+    # AWS NLB configuration for cross-zone load balancing
+    service.beta.kubernetes.io/aws-load-balancer-type: "nlb"
+    service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: "true"
+
+spec:
+  # Using ClusterIP for internal access only since we have an Ingress for external traffic
+  type: ClusterIP
+  
+  # Port configuration for HTTPS API and WebSocket endpoints
+  ports:
+    - name: https
+      port: 443 # External port
+      targetPort: 3000 # Container port
+      protocol: TCP
+    - name: websocket
+      port: 3001
+      targetPort: 3001
+      protocol: TCP
+  
+  # Selector to match backend deployment pods
+  selector:
+    app: backend-api
+    component: api
+  
+  # Session affinity configuration for WebSocket connections
+  sessionAffinity: ClientIP
+  sessionAffinityConfig:
+    clientIP:
+      timeoutSeconds: 10800 # 3 hour timeout for session stickiness
