@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Main Activity Layout
+  Implements Material Design 3 components with enhanced accessibility support
+  Supports screen sizes from 320dp to 1200dp following responsive design guidelines
+  WCAG 2.1 Level AA compliant with proper content descriptions and navigation support
+-->
+<androidx.constraintlayout.widget.ConstraintLayout 
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/root_container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    android:background="?attr/colorBackground"
+    android:importantForAccessibility="yes"
+    tools:context=".ui.MainActivity">
+
+    <!-- App Bar with Material Design 3 styling -->
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appbar_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fitsSystemWindows="true"
+        android:background="?attr/colorSurface"
+        android:elevation="@dimen/appbar_elevation"
+        android:importantForAccessibility="yes"
+        android:contentDescription="@string/app_name"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:minHeight="?attr/actionBarSize"
+            android:theme="@style/ThemeOverlay.Material3.ActionBar"
+            android:contentDescription="@string/app_name"
+            app:titleTextAppearance="@style/TextAppearance.App.Heading"
+            app:titleCentered="true"
+            app:navigationIconTint="?attr/colorOnSurface"
+            app:menu="@menu/main_menu"
+            tools:title="@string/app_name"/>
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <!-- Navigation Host Fragment for managing app navigation -->
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/nav_host_fragment"
+        android:name="androidx.navigation.fragment.NavHostFragment"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:importantForAccessibility="yes"
+        app:defaultNavHost="true"
+        app:navGraph="@navigation/nav_graph"
+        app:layout_constraintTop_toBottomOf="@id/appbar_layout"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        tools:layout="@layout/fragment_message_list"/>
+
+    <!-- Loading Overlay -->
+    <include
+        android:id="@+id/loading_state"
+        layout="@layout/view_loading"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@id/appbar_layout"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <!-- Error State Overlay -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/error_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:visibility="gone"
+        app:cardElevation="4dp"
+        app:cardCornerRadius="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <TextView
+            android:id="@+id/error_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="16dp"
+            android:textAppearance="@style/TextAppearance.App.Body"
+            android:textColor="?attr/colorError"
+            android:gravity="center"
+            android:importantForAccessibility="yes"
+            tools:text="@string/error_generic"/>
+
+    </com.google.android.material.card.MaterialCardView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
