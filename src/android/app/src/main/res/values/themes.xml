@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Material Design 3 light theme implementation - Version 1.8.0 -->
+<resources xmlns:tools="http://schemas.android.com/tools">
+    
+    <!-- Base application theme extending Material Design 3 -->
+    <style name="Theme.App" parent="Theme.Material3.Light.NoActionBar">
+        <!-- Color system attributes -->
+        <item name="colorPrimary">@color/color_primary</item>
+        <item name="colorPrimaryContainer">@color/color_primary</item>
+        <item name="colorSecondary">@color/color_secondary</item>
+        <item name="colorSecondaryContainer">@color/color_secondary</item>
+        <item name="android:colorBackground">@color/color_background</item>
+        <item name="colorSurface">@color/color_surface</item>
+        <item name="colorSurfaceContainer">@color/color_surface_container</item>
+        <item name="colorSurfaceContainerHigh">@color/color_surface_container</item>
+        <item name="colorSurfaceContainerLow">@color/color_surface_container</item>
+        <item name="colorSurfaceTint">@color/color_surface_tint</item>
+        
+        <!-- System bars configuration -->
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:windowLightNavigationBar" tools:targetApi="27">true</item>
+        
+        <!-- Window background -->
+        <item name="android:windowBackground">@color/color_background</item>
+        
+        <!-- Typography styles -->
+        <item name="textAppearanceDisplayLarge">@style/TextAppearance.App.Display</item>
+        <item name="textAppearanceDisplayMedium">@style/TextAppearance.App.Display</item>
+        <item name="textAppearanceDisplaySmall">@style/TextAppearance.App.Display</item>
+        <item name="textAppearanceHeadlineLarge">@style/TextAppearance.App.Heading</item>
+        <item name="textAppearanceHeadlineMedium">@style/TextAppearance.App.Heading</item>
+        <item name="textAppearanceHeadlineSmall">@style/TextAppearance.App.Heading</item>
+        <item name="textAppearanceBodyLarge">@style/TextAppearance.App.Body</item>
+        <item name="textAppearanceBodyMedium">@style/TextAppearance.App.Body</item>
+        <item name="textAppearanceBodySmall">@style/TextAppearance.App.Body</item>
+        <item name="textAppearanceLabelLarge">@style/TextAppearance.App.Label</item>
+        <item name="textAppearanceLabelMedium">@style/TextAppearance.App.Label</item>
+        <item name="textAppearanceLabelSmall">@style/TextAppearance.App.Label</item>
+        <item name="android:textColorPrimary">@color/color_text_primary</item>
+        
+        <!-- Component styles -->
+        <item name="materialButtonStyle">@style/Widget.App.Button.Primary</item>
+        <item name="materialButtonOutlinedStyle">@style/Widget.App.Button.Secondary</item>
+        <item name="materialCardViewStyle">@style/Widget.App.Card</item>
+        <item name="materialDialogTheme">@style/Widget.App.Dialog</item>
+        
+        <!-- Shape appearance for components -->
+        <item name="shapeAppearanceCornerSmall">4dp</item>
+        <item name="shapeAppearanceCornerMedium">8dp</item>
+        <item name="shapeAppearanceCornerLarge">16dp</item>
+    </style>
+
+    <!-- Splash screen theme -->
+    <style name="Theme.App.Starting" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/color_background</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_splash</item>
+        <item name="windowSplashScreenAnimationDuration">1000</item>
+        <item name="postSplashScreenTheme">@style/Theme.App</item>
+        
+        <!-- System bars configuration for splash screen -->
+        <item name="android:statusBarColor">@color/color_background</item>
+        <item name="android:navigationBarColor">@color/color_background</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:windowLightNavigationBar" tools:targetApi="27">true</item>
+    </style>
+
+</resources>
