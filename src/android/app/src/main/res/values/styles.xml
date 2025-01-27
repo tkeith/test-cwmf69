@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Material Design 3 Components v1.8.0 -->
+<resources xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <!-- Base application theme -->
+    <style name="Theme.App" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/color_primary</item>
+        <item name="colorSecondary">@color/color_secondary</item>
+        <item name="android:textColorPrimary">@color/color_text_primary</item>
+        <item name="android:textColorSecondary">@color/color_text_secondary</item>
+        <item name="android:statusBarColor">?attr/colorPrimary</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:windowLightStatusBar">true</item>
+    </style>
+
+    <!-- Base text appearance style -->
+    <style name="TextAppearance.App.Base" parent="TextAppearance.Material3.Body1">
+        <item name="android:textColor">?android:attr/textColorPrimary</item>
+        <item name="android:fontFamily">@font/roboto</item>
+        <item name="android:includeFontPadding">false</item>
+    </style>
+
+    <!-- Heading text style (16-24sp) -->
+    <style name="TextAppearance.App.Heading" parent="TextAppearance.App.Base">
+        <item name="android:fontFamily">@font/roboto</item>
+        <item name="android:textFontWeight">700</item>
+        <item name="android:textSize">20sp</item>
+        <item name="android:letterSpacing">0.0125</item>
+        <item name="android:lineHeight">28sp</item>
+    </style>
+
+    <!-- Body text style (14sp) -->
+    <style name="TextAppearance.App.Body" parent="TextAppearance.App.Base">
+        <item name="android:fontFamily">@font/roboto</item>
+        <item name="android:textFontWeight">400</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:letterSpacing">0.0178</item>
+        <item name="android:lineHeight">20sp</item>
+        <item name="android:lineSpacingMultiplier">1.2</item>
+    </style>
+
+    <!-- Label text style (12sp) -->
+    <style name="TextAppearance.App.Label" parent="TextAppearance.App.Base">
+        <item name="android:fontFamily">@font/roboto</item>
+        <item name="android:textFontWeight">500</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:letterSpacing">0.0333</item>
+        <item name="android:lineHeight">16sp</item>
+    </style>
+
+    <!-- Timestamp text style (10sp) -->
+    <style name="TextAppearance.App.Timestamp" parent="TextAppearance.App.Base">
+        <item name="android:fontFamily">@font/roboto</item>
+        <item name="android:textFontWeight">300</item>
+        <item name="android:textSize">10sp</item>
+        <item name="android:letterSpacing">0.04</item>
+        <item name="android:lineHeight">14sp</item>
+    </style>
+
+    <!-- Base widget style -->
+    <style name="Widget.App.Base" parent="Widget.Material3.CardView.Elevated">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:background">?attr/colorSurface</item>
+    </style>
+
+    <!-- Primary action button style -->
+    <style name="Widget.App.Button.Primary" parent="Widget.Material3.Button">
+        <item name="android:background">?attr/colorPrimary</item>
+        <item name="android:textAppearance">@style/TextAppearance.App.Label</item>
+        <item name="android:textColor">?attr/colorOnPrimary</item>
+        <item name="android:padding">16dp</item>
+        <item name="android:elevation">2dp</item>
+        <item name="android:minHeight">56dp</item>
+        <item name="android:stateListAnimator">@animator/button_state_list_animator</item>
+        <item name="cornerRadius">28dp</item>
+    </style>
+
+    <!-- Secondary action button style -->
+    <style name="Widget.App.Button.Secondary" parent="Widget.Material3.Button.OutlinedButton">
+        <item name="android:textAppearance">@style/TextAppearance.App.Label</item>
+        <item name="android:padding">16dp</item>
+        <item name="android:minHeight">56dp</item>
+        <item name="cornerRadius">28dp</item>
+        <item name="strokeColor">?attr/colorSecondary</item>
+        <item name="strokeWidth">1dp</item>
+    </style>
+
+    <!-- Delay timer component style -->
+    <style name="Widget.App.DelayTimer" parent="Widget.App.Base">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:padding">16dp</item>
+        <item name="android:background">@android:color/transparent</item>
+        <item name="app:progressBarStyle">@style/Widget.App.ProgressBar</item>
+        <item name="android:layout_marginVertical">8dp</item>
+    </style>
+
+    <!-- Progress bar style for delay timer -->
+    <style name="Widget.App.ProgressBar" parent="Widget.Material3.LinearProgressIndicator">
+        <item name="android:indeterminate">false</item>
+        <item name="trackThickness">4dp</item>
+        <item name="trackCornerRadius">2dp</item>
+        <item name="indicatorColor">?attr/colorPrimary</item>
+        <item name="trackColor">?attr/colorSurfaceVariant</item>
+    </style>
+
+    <!-- Message list item style -->
+    <style name="Widget.App.MessageItem" parent="Widget.App.Base">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:padding">16dp</item>
+        <item name="android:background">?attr/colorSurface</item>
+        <item name="android:elevation">1dp</item>
+        <item name="android:layout_marginVertical">4dp</item>
+        <item name="cornerRadius">12dp</item>
+        <item name="cardElevation">1dp</item>
+    </style>
+
+    <!-- Input field style -->
+    <style name="Widget.App.TextInputLayout" parent="Widget.Material3.TextInputLayout.OutlinedBox">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginVertical">8dp</item>
+        <item name="boxStrokeWidth">1dp</item>
+        <item name="boxCornerRadiusTopStart">12dp</item>
+        <item name="boxCornerRadiusTopEnd">12dp</item>
+        <item name="boxCornerRadiusBottomStart">12dp</item>
+        <item name="boxCornerRadiusBottomEnd">12dp</item>
+    </style>
+
+</resources>
