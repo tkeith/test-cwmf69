@@ -1,0 +1,1 @@
+create an app where users can log in with username/password and send messages to each other, but the receiver only receives the message after a delay of 30-60 seconds
