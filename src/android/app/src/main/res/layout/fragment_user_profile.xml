@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/profile_container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?attr/colorSurface"
+    android:importantForAccessibility="yes"
+    android:contentDescription="@string/profile_screen_description">
+
+    <!-- Loading state -->
+    <include
+        android:id="@+id/loading_view"
+        layout="@layout/view_loading"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- Error state -->
+    <include
+        android:id="@+id/error_view"
+        layout="@layout/view_error"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- Profile content -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/profile_card"
+        style="@style/Widget.Material3.CardView.Elevated"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        app:cardElevation="2dp"
+        app:cardCornerRadius="12dp"
+        android:importantForAccessibility="yes"
+        android:contentDescription="@string/profile_card_description"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="16dp">
+
+            <!-- Profile Avatar -->
+            <com.google.android.material.imageview.ShapeableImageView
+                android:id="@+id/profile_avatar"
+                android:layout_width="96dp"
+                android:layout_height="96dp"
+                android:importantForAccessibility="yes"
+                android:contentDescription="@string/profile_avatar_description"
+                app:shapeAppearance="@style/ShapeAppearance.Material3.Circle"
+                android:src="@drawable/default_avatar"
+                app:strokeWidth="2dp"
+                app:strokeColor="?attr/colorPrimary"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent" />
+
+            <!-- Online Status Indicator -->
+            <View
+                android:id="@+id/status_indicator"
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:background="@drawable/status_indicator_background"
+                android:importantForAccessibility="yes"
+                android:contentDescription="@string/online"
+                app:layout_constraintEnd_toEndOf="@id/profile_avatar"
+                app:layout_constraintBottom_toBottomOf="@id/profile_avatar" />
+
+            <!-- Username -->
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/username_text"
+                style="@style/TextAppearance.Material3.HeadlineMedium"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:textAlignment="center"
+                android:textColor="?attr/colorOnSurface"
+                android:importantForAccessibility="yes"
+                tools:text="Username"
+                app:layout_constraintTop_toBottomOf="@id/profile_avatar"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent" />
+
+            <!-- Email -->
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/email_text"
+                style="@style/TextAppearance.Material3.BodyLarge"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:textAlignment="center"
+                android:textColor="?attr/colorOnSurfaceVariant"
+                android:importantForAccessibility="yes"
+                tools:text="user@example.com"
+                app:layout_constraintTop_toBottomOf="@id/username_text"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </com.google.android.material.card.MaterialCardView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
