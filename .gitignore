@@ -1,0 +1,144 @@
+# Environment Files
+.env
+.env.local
+.env.*.local
+*.env
+!.env.example
+
+# Dependencies
+node_modules/
+vendor/
+pods/
+.gradle/
+
+# Build Outputs
+dist/
+build/
+out/
+*.apk
+*.ipa
+*.xcarchive
+
+# IDE and Editor Files
+.idea/
+.vscode/
+*.sublime-*
+*.swp
+*.swo
+*.iml
+
+# System Files
+.DS_Store
+Thumbs.db
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Security and Credentials
+*.pem
+*.key
+*.keystore
+*.jks
+google-services.json
+GoogleService-Info.plist
+firebase-config.json
+
+# Test Outputs
+coverage/
+junit.xml
+test-results/
+cypress/videos/
+cypress/screenshots/
+
+# Infrastructure
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfvars
+!example.tfvars
+kubeconfig
+*.pem
+
+# iOS Specific
+## Build generated
+DerivedData/
+build/
+*.pbxuser
+!default.pbxuser
+*.mode1v3
+!default.mode1v3
+*.mode2v3
+!default.mode2v3
+*.perspectivev3
+!default.perspectivev3
+xcuserdata/
+*.moved-aside
+*.xccheckout
+*.xcscmblueprint
+*.hmap
+*.ipa
+*.dSYM.zip
+*.dSYM
+
+# Android Specific
+*.iml
+.gradle
+/local.properties
+/.idea
+.DS_Store
+/build
+/captures
+.externalNativeBuild
+.cxx
+*.aab
+
+# Web Build
+/dist
+.cache/
+.parcel-cache/
+.next/
+.nuxt/
+.vuepress/dist
+.serverless/
+.fusebox/
+.dynamodb/
+
+# Temporary Files
+*.tmp
+*.temp
+*.bak
+*~
+
+# Logs and Databases
+*.sqlite
+*.sqlite3
+*.db
+logs/
+*.log.*
+
+# OS Generated
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+desktop.ini
+
+# Package Managers
+yarn.lock
+package-lock.json
+npm-shrinkwrap.json
+.pnpm-lock.yaml
+
+# Docker
+.docker/
+docker-compose.override.yml
+
+# Misc
+.env.development.local
+.env.test.local
+.env.production.local
+.env.staging.local
+*.cache
+.eslintcache
+.stylelintcache
