@@ -1,0 +1,195 @@
+name: iOS CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'src/ios/**'
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - 'src/ios/**'
+  workflow_dispatch:
+
+env:
+  DEVELOPER_DIR: /Applications/Xcode_14.x.app/Contents/Developer
+  FASTLANE_XCODEBUILD_SETTINGS_TIMEOUT: 180
+  FASTLANE_XCODE_LIST_TIMEOUT: 180
+  FASTLANE_SKIP_UPDATE_CHECK: true
+  LC_ALL: en_US.UTF-8
+  LANG: en_US.UTF-8
+
+jobs:
+  test-and-build:
+    name: Test and Build
+    runs-on: macos-latest
+    timeout-minutes: 60
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          lfs: true
+          fetch-depth: 0
+      
+      - name: Setup Ruby environment
+        uses: actions/setup-ruby@v1
+        with:
+          ruby-version: '2.7'
+          bundler-cache: true
+      
+      - name: Cache Gems
+        uses: actions/cache@v3
+        with:
+          path: vendor/bundle
+          key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-gems-
+      
+      - name: Cache Pods
+        uses: actions/cache@v3
+        with:
+          path: Pods
+          key: ${{ runner.os }}-pods-${{ hashFiles('**/Podfile.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-pods-
+      
+      - name: Cache DerivedData
+        uses: actions/cache@v3
+        with:
+          path: ~/Library/Developer/Xcode/DerivedData
+          key: ${{ runner.os }}-derived-data-${{ hashFiles('**/Podfile.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-derived-data-
+      
+      - name: Setup environment
+        run: |
+          cd src/ios
+          bundle config path vendor/bundle
+          bundle install --jobs 4 --retry 3
+          bundle exec pod install
+      
+      - name: Setup certificates
+        env:
+          MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+          MATCH_GIT_URL: ${{ secrets.MATCH_GIT_URL }}
+          FASTLANE_USER: ${{ secrets.FASTLANE_USER }}
+          FASTLANE_PASSWORD: ${{ secrets.FASTLANE_PASSWORD }}
+        run: |
+          cd src/ios
+          bundle exec fastlane run match development
+      
+      - name: Run tests
+        env:
+          SLACK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
+        run: |
+          cd src/ios
+          bundle exec fastlane test
+      
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-results
+          path: src/ios/fastlane/test_output
+          retention-days: 14
+
+  deploy-staging:
+    name: Deploy to TestFlight
+    needs: test-and-build
+    if: github.ref == 'refs/heads/develop'
+    runs-on: macos-latest
+    environment: staging
+    timeout-minutes: 45
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      
+      - name: Setup Ruby environment
+        uses: actions/setup-ruby@v1
+        with:
+          ruby-version: '2.7'
+          bundler-cache: true
+      
+      - name: Setup environment
+        run: |
+          cd src/ios
+          bundle config path vendor/bundle
+          bundle install --jobs 4 --retry 3
+          bundle exec pod install
+      
+      - name: Deploy to TestFlight
+        env:
+          MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+          MATCH_GIT_URL: ${{ secrets.MATCH_GIT_URL }}
+          FASTLANE_USER: ${{ secrets.FASTLANE_USER }}
+          FASTLANE_PASSWORD: ${{ secrets.FASTLANE_PASSWORD }}
+          SLACK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
+          DEMO_ACCOUNT_NAME: ${{ secrets.DEMO_ACCOUNT_NAME }}
+          DEMO_ACCOUNT_PASSWORD: ${{ secrets.DEMO_ACCOUNT_PASSWORD }}
+        run: |
+          cd src/ios
+          bundle exec fastlane deploy_staging
+
+  deploy-production:
+    name: Deploy to App Store
+    needs: test-and-build
+    if: github.ref == 'refs/heads/main'
+    runs-on: macos-latest
+    environment: production
+    timeout-minutes: 45
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      
+      - name: Setup Ruby environment
+        uses: actions/setup-ruby@v1
+        with:
+          ruby-version: '2.7'
+          bundler-cache: true
+      
+      - name: Setup environment
+        run: |
+          cd src/ios
+          bundle config path vendor/bundle
+          bundle install --jobs 4 --retry 3
+          bundle exec pod install
+      
+      - name: Deploy to App Store
+        env:
+          MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+          MATCH_GIT_URL: ${{ secrets.MATCH_GIT_URL }}
+          FASTLANE_USER: ${{ secrets.FASTLANE_USER }}
+          FASTLANE_PASSWORD: ${{ secrets.FASTLANE_PASSWORD }}
+          SLACK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
+          AWS_ACCESS_KEY: ${{ secrets.AWS_ACCESS_KEY }}
+          AWS_SECRET_KEY: ${{ secrets.AWS_SECRET_KEY }}
+          AWS_BUCKET: ${{ secrets.AWS_BUCKET }}
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+        run: |
+          cd src/ios
+          bundle exec fastlane deploy_production
+
+  cleanup:
+    name: Cleanup
+    needs: [deploy-staging, deploy-production]
+    if: always()
+    runs-on: macos-latest
+    timeout-minutes: 10
+    
+    steps:
+      - name: Cleanup artifacts
+        uses: geekyeggo/delete-artifact@v2
+        with:
+          name: |
+            test-results
+          failOnError: false
