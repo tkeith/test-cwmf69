@@ -1,0 +1,73 @@
+# Grafana Datasource Configuration v9.5.x
+# This file configures data sources for the Delayed Messaging System monitoring
+
+apiVersion: 1
+
+# Datasources configuration
+datasources:
+  # Prometheus - Primary metrics data source
+  - name: Prometheus
+    type: prometheus
+    access: proxy
+    url: http://prometheus:9090
+    isDefault: true
+    version: 1
+    editable: false
+    jsonData:
+      timeInterval: "15s"
+      queryTimeout: "30s"
+      httpMethod: POST
+      exemplarTraceIdDestinations:
+        - name: trace_id
+          datasourceUid: jaeger
+
+  # PostgreSQL - Database metrics
+  - name: PostgreSQL
+    type: postgres
+    access: proxy
+    url: postgres-exporter:9187
+    database: delayedmessaging
+    user: ${DB_USER}
+    secureJsonData:
+      password: ${DB_PASSWORD}
+    jsonData:
+      sslmode: require
+      maxOpenConns: 100
+      maxIdleConns: 10
+      connMaxLifetime: "14400"
+      postgresVersion: 14
+      timescaledb: false
+    version: 1
+    editable: false
+
+  # Redis - Queue and cache monitoring
+  - name: Redis
+    type: redis-datasource
+    access: proxy
+    url: redis-exporter:9121
+    jsonData:
+      client: standalone
+      poolSize: 5
+      timeout: 10
+      pingInterval: 0
+      pipelineWindow: 0
+      maxRetries: 3
+      commandTimeout: 5
+    version: 1
+    editable: false
+
+# Global settings
+settings:
+  default_datasource: Prometheus
+  allow_unauthorized_datasources: false
+  disable_deletion: true
+  update_interval: "15s"
+
+# Disable deletion of provisioned datasources
+deleteDatasources:
+  - name: Prometheus
+    orgId: 1
+  - name: PostgreSQL
+    orgId: 1
+  - name: Redis
+    orgId: 1
