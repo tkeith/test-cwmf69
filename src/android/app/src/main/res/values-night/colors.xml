@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Primary brand colors -->
+    <color name="color_primary">#1976D2</color>
+    <color name="color_primary_variant">#0D47A1</color>
+    
+    <!-- Secondary colors -->
+    <color name="color_secondary">#616161</color>
+    <color name="color_secondary_variant">#424242</color>
+    
+    <!-- State colors -->
+    <color name="color_success">#388E3C</color>
+    <color name="color_warning">#FFA000</color>
+    <color name="color_error">#D32F2F</color>
+    
+    <!-- Background and surface colors optimized for OLED displays -->
+    <color name="color_background">#121212</color>
+    <color name="color_surface">#121212</color>
+    
+    <!-- Surface elevation colors following Material Design elevation system -->
+    <color name="color_surface_1">#1E1E1E</color>
+    <color name="color_surface_2">#222222</color>
+    <color name="color_surface_3">#252525</color>
+    
+    <!-- Text colors with WCAG 2.1 Level AA compliant contrast ratios -->
+    <color name="color_text_primary">#FFFFFF</color>
+    <color name="color_text_secondary">#B0B0B0</color>
+    <color name="color_text_disabled">#666666</color>
+    
+    <!-- Colors for elements on top of surfaces -->
+    <color name="color_on_surface">#FFFFFF</color>
+    <color name="color_on_primary">#FFFFFF</color>
+    <color name="color_on_secondary">#FFFFFF</color>
+    
+    <!-- Utility colors -->
+    <color name="color_ripple">#33FFFFFF</color>
+    <color name="color_scrim">#99000000</color>
+</resources>
