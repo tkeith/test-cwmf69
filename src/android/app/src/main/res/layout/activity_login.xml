@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp"
+    android:background="@color/color_background"
+    android:clipToPadding="false"
+    android:fitsSystemWindows="true"
+    android:importantForAccessibility="yes">
+
+    <TextView
+        android:id="@+id/loginTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="48dp"
+        android:text="@string/login_title"
+        android:textAppearance="@style/TextAppearance.App.Heading"
+        android:textColor="@color/color_text_primary"
+        android:contentDescription="@string/login_title_content_description"
+        android:accessibilityHeading="true"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/usernameLayout"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:hint="@string/username_hint"
+        app:errorEnabled="true"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/loginTitle">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/usernameInput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:imeOptions="actionNext"
+            android:importantForAutofill="yes"
+            android:inputType="text"
+            android:maxLines="1"
+            android:minHeight="48dp"
+            android:textColor="@color/color_text_primary"
+            android:autofillHints="username" />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/passwordLayout"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:hint="@string/password_hint"
+        app:errorEnabled="true"
+        app:passwordToggleEnabled="true"
+        app:passwordToggleContentDescription="@string/password_toggle_content_description"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/usernameLayout">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/passwordInput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:imeOptions="actionDone"
+            android:importantForAutofill="yes"
+            android:inputType="textPassword"
+            android:maxLines="1"
+            android:minHeight="48dp"
+            android:textColor="@color/color_text_primary"
+            android:autofillHints="password" />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/loginButton"
+        style="@style/Widget.App.Button.Primary"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:minHeight="48dp"
+        android:text="@string/login_button"
+        android:contentDescription="@string/login_button_content_description"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/passwordLayout" />
+
+    <include
+        android:id="@+id/loadingView"
+        layout="@layout/view_loading"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"
+        android:contentDescription="@string/loading_content_description"
+        tools:visibility="gone" />
+
+    <include
+        android:id="@+id/errorView"
+        layout="@layout/view_error"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"
+        android:contentDescription="@string/error_content_description"
+        tools:visibility="gone" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
