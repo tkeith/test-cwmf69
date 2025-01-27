@@ -1,0 +1,41 @@
+.git
+.gitignore
+
+# Dependencies
+node_modules
+
+# Build outputs
+dist
+coverage
+
+# Test files
+tests
+*.test.ts
+*.spec.ts
+
+# Logs
+*.log
+
+# Sensitive files
+.env*
+*.key
+*.pem
+
+# Documentation
+README.md
+CHANGELOG.md
+docs/
+
+# Development configs
+.dockerignore
+.eslintrc*
+.prettierrc*
+nodemon.json
+jest.config.ts
+docker-compose*
+
+# Keep essential files for layer caching
+!package.json
+!package-lock.json
+!prisma/schema.prisma
+!tsconfig.json
