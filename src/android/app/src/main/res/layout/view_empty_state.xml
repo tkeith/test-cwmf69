@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Empty state view component following Material Design 3 guidelines
+  Used to display a message and illustration when no content is available
+  Implements WCAG 2.1 Level AA compliance with proper accessibility support
+-->
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:importantForAccessibility="yes"
+    android:focusable="true"
+    android:contentDescription="@string/empty_messages">
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/empty_state_image"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:src="@drawable/empty_state_illustration"
+        android:importantForAccessibility="no"
+        android:contentDescription="@string/empty_messages"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/empty_state_text"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintVertical_chainStyle="packed"/>
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/empty_state_text"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="@string/empty_messages"
+        android:textAppearance="@style/TextAppearance.App.Heading"
+        android:textColor="@color/md_theme_light_onSurfaceVariant"
+        android:gravity="center"
+        android:layout_marginTop="16dp"
+        android:layout_marginStart="32dp"
+        android:layout_marginEnd="32dp"
+        android:accessibilityHeading="true"
+        android:importantForAccessibility="yes"
+        app:layout_constraintTop_toBottomOf="@id/empty_state_image"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        tools:text="No messages yet"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
