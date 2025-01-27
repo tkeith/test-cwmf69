@@ -1,0 +1,12 @@
+# Fastlane configuration for Android app deployment
+# Version: 2.216.0
+
+# Android application package identifier for Play Store deployment
+package_name("com.delayedmessaging.android")
+
+# Environment-specific Google Play Store API credentials
+# Uses secure environment variables to avoid hardcoding sensitive data
+json_key_file(
+  staging: ENV['PLAY_STORE_STAGING_KEY'],
+  production: ENV['PLAY_STORE_PRODUCTION_KEY']
+)
