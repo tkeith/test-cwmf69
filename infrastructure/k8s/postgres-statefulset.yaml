@@ -1,0 +1,137 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: postgres
+  namespace: default
+  labels:
+    app: postgres
+    tier: database
+    component: primary-storage
+  annotations:
+    # Enable backup for persistent volumes
+    backup.velero.io/backup-volumes: postgres-data
+    # Enable Prometheus monitoring
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "9187"
+
+spec:
+  serviceName: postgres
+  # Deploy primary and replica for high availability
+  replicas: 2
+  # Ensure ordered pod creation/deletion
+  podManagementPolicy: OrderedReady
+  # Use rolling updates for zero-downtime upgrades
+  updateStrategy:
+    type: RollingUpdate
+  
+  selector:
+    matchLabels:
+      app: postgres
+
+  template:
+    metadata:
+      labels:
+        app: postgres
+        # Enable Istio mTLS
+        security.istio.io/tlsMode: istio
+    
+    spec:
+      # Allow graceful shutdown
+      terminationGracePeriodSeconds: 60
+      
+      # Run as non-root user for security
+      securityContext:
+        fsGroup: 999
+        runAsUser: 999
+        runAsGroup: 999
+
+      containers:
+      - name: postgres
+        image: postgres:14
+        imagePullPolicy: IfNotPresent
+        
+        ports:
+        - containerPort: 5432
+          name: postgresql
+        
+        env:
+        # Secure credentials from Kubernetes secrets
+        - name: POSTGRES_USER
+          valueFrom:
+            secretKeyRef:
+              name: backend-secrets
+              key: DB_USER
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: backend-secrets
+              key: DB_PASSWORD
+        - name: POSTGRES_DB
+          value: delayed_messaging
+        - name: PGDATA
+          value: /var/lib/postgresql/data/pgdata
+
+        volumeMounts:
+        - name: postgres-data
+          mountPath: /var/lib/postgresql/data
+        - name: postgres-config
+          mountPath: /etc/postgresql/conf.d
+
+        # Resource limits for performance optimization
+        resources:
+          requests:
+            memory: "2Gi"
+            cpu: "1"
+          limits:
+            memory: "4Gi"
+            cpu: "2"
+
+        # Health monitoring
+        livenessProbe:
+          exec:
+            command:
+            - pg_isready
+            - -U
+            - $(POSTGRES_USER)
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          successThreshold: 1
+          failureThreshold: 3
+
+        readinessProbe:
+          exec:
+            command:
+            - pg_isready
+            - -U
+            - $(POSTGRES_USER)
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          timeoutSeconds: 3
+          successThreshold: 1
+          failureThreshold: 3
+
+        startupProbe:
+          exec:
+            command:
+            - pg_isready
+            - -U
+            - $(POSTGRES_USER)
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          timeoutSeconds: 3
+          successThreshold: 1
+          failureThreshold: 30
+
+  # Persistent storage configuration
+  volumeClaimTemplates:
+  - metadata:
+      name: postgres-data
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          # Allocate sufficient storage for data and indexes
+          storage: 50Gi
+      storageClassName: standard
