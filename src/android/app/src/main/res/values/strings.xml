@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- App name -->
+    <string name="app_name">Delayed Messaging</string>
+
+    <!-- Authentication strings -->
+    <string name="username_hint">Username</string>
+    <string name="username_content_description">Enter your username</string>
+    <string name="password_hint">Password</string>
+    <string name="password_content_description">Enter your password</string>
+    <string name="email_hint">Email</string>
+    <string name="email_content_description">Enter your email address</string>
+    <string name="sign_in">Sign In</string>
+    <string name="register">Register</string>
+    <string name="register_title">Create Account</string>
+    <string name="already_have_account">Already have an account? Sign in</string>
+
+    <!-- Message composition and delivery -->
+    <string name="compose_message">Compose Message</string>
+    <string name="compose_message_content_description">Tap to compose a new message</string>
+    <string name="message_sent">Message sent</string>
+    <string name="message_queued">Message queued for delivery</string>
+    <string name="message_delivered">Message delivered</string>
+    <string name="delivery_time_remaining">%1$d seconds remaining</string>
+    <plurals name="delivery_time_remaining_plural">
+        <item quantity="one">%d second remaining</item>
+        <item quantity="other">%d seconds remaining</item>
+    </plurals>
+
+    <!-- Empty states -->
+    <string name="empty_messages">No messages yet</string>
+
+    <!-- Error messages -->
+    <string name="error_generic">Something went wrong. Please try again.</string>
+    <string name="error_network">Unable to connect to the server. Please check your internet connection and try again.</string>
+    <string name="error_invalid_credentials">Invalid username or password. Please try again.</string>
+    <string name="error_validation">Please check your input and try again.</string>
+    <string name="retry">Retry</string>
+
+    <!-- User status -->
+    <string name="online">Online</string>
+    <string name="offline">Offline</string>
+</resources>
