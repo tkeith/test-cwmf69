@@ -1,0 +1,254 @@
+# Fastlane configuration for Delayed Messaging Android app
+# Version: 2.216.0
+
+# Import required plugins
+# fastlane-plugin-gradle@1.5.0
+# fastlane-plugin-firebase_app_distribution@0.4.1
+# fastlane-plugin-sonarqube@1.1.0
+fastlane_require 'fastlane-plugin-gradle'
+fastlane_require 'fastlane-plugin-firebase_app_distribution'
+fastlane_require 'fastlane-plugin-sonarqube'
+
+# Platform configuration
+default_platform(:android)
+
+# Constants
+CREDENTIAL_PATH = '~/.android/credentials.json'
+ERROR_NOTIFICATION_WEBHOOK = 'https://api.notification.service/webhook'
+
+platform :android do
+  before_all do |lane|
+    # Verify clean git status
+    ensure_git_status_clean
+
+    # Load secure credentials
+    unless File.exist?(File.expand_path(CREDENTIAL_PATH))
+      UI.user_error!("Credentials file not found at #{CREDENTIAL_PATH}")
+    end
+
+    # Verify required environment variables
+    verify_required_env_vars([
+      'PLAY_STORE_STAGING_KEY',
+      'PLAY_STORE_PRODUCTION_KEY',
+      'FIREBASE_TOKEN',
+      'SONAR_TOKEN'
+    ])
+
+    # Setup error monitoring
+    error_callback = lambda do |exception, context|
+      notify_error(exception, context, ERROR_NOTIFICATION_WEBHOOK)
+    end
+    Fastlane::Crashlytics.add_callback(error_callback)
+  end
+
+  desc "Run comprehensive test suite"
+  lane :test do
+    # Static code analysis
+    gradle(task: "ktlintCheck")
+    gradle(task: "detekt")
+
+    # Unit tests with coverage
+    gradle(
+      task: "testDebugUnitTest",
+      flags: "--stacktrace",
+      properties: {
+        "testCoverageEnabled" => "true"
+      }
+    )
+
+    # Instrumentation tests
+    gradle(
+      task: "connectedDebugAndroidTest",
+      flags: "--stacktrace"
+    )
+
+    # SonarQube analysis
+    sonar(
+      project_key: "delayed-messaging-android",
+      project_version: get_version_name,
+      project_name: "Delayed Messaging Android",
+      sonar_organization: "delayed-messaging",
+      sonar_login: ENV["SONAR_TOKEN"],
+      sonar_url: ENV["SONAR_HOST_URL"]
+    )
+  end
+
+  desc "Build staging variant"
+  lane :build_staging do
+    # Clean build directory
+    gradle(task: "clean")
+
+    # Verify dependencies
+    gradle(task: "dependencyUpdates")
+
+    # Increment version code
+    increment_version_code
+
+    # Security scan
+    gradle(task: "dependencyCheckAnalyze")
+
+    # Build staging variant
+    gradle(
+      task: "bundleStagingRelease",
+      properties: {
+        "android.injected.signing.store.file" => ENV["STAGING_KEYSTORE_PATH"],
+        "android.injected.signing.store.password" => ENV["STAGING_KEYSTORE_PASSWORD"],
+        "android.injected.signing.key.alias" => ENV["STAGING_KEY_ALIAS"],
+        "android.injected.signing.key.password" => ENV["STAGING_KEY_PASSWORD"]
+      }
+    )
+
+    # Verify build artifacts
+    validate_build_artifacts("staging")
+  end
+
+  desc "Build production variant"
+  lane :build_production do
+    # Clean build directory
+    gradle(task: "clean")
+
+    # Security audit
+    gradle(task: "dependencyCheckAnalyze")
+
+    # Build release variant
+    gradle(
+      task: "bundleRelease",
+      properties: {
+        "android.injected.signing.store.file" => ENV["PRODUCTION_KEYSTORE_PATH"],
+        "android.injected.signing.store.password" => ENV["PRODUCTION_KEYSTORE_PASSWORD"],
+        "android.injected.signing.key.alias" => ENV["PRODUCTION_KEY_ALIAS"],
+        "android.injected.signing.key.password" => ENV["PRODUCTION_KEY_PASSWORD"]
+      }
+    )
+
+    # Verify build artifacts
+    validate_build_artifacts("production")
+
+    # Backup artifacts
+    backup_build_artifacts
+  end
+
+  desc "Deploy to staging"
+  lane :deploy_staging do
+    # Verify build artifacts
+    validate_build_artifacts("staging")
+
+    # Upload to internal testing
+    upload_to_play_store(
+      track: 'internal',
+      json_key: ENV['PLAY_STORE_STAGING_KEY'],
+      aab: lane_context[SharedValues::GRADLE_AAB_OUTPUT_PATH],
+      skip_upload_metadata: true,
+      skip_upload_images: true,
+      skip_upload_screenshots: true,
+      release_status: "draft"
+    )
+
+    # Firebase distribution for internal testing
+    firebase_app_distribution(
+      app: ENV["FIREBASE_APP_ID_STAGING"],
+      groups: "testers",
+      release_notes: generate_changelog,
+      firebase_cli_token: ENV["FIREBASE_TOKEN"]
+    )
+
+    # Monitor deployment
+    monitor_staging_deployment
+  end
+
+  desc "Deploy to production"
+  lane :deploy_production do
+    # Verify build artifacts
+    validate_build_artifacts("production")
+
+    # Backup current production version
+    backup_production_version
+
+    # Upload to production
+    upload_to_play_store(
+      track: 'production',
+      json_key: ENV['PLAY_STORE_PRODUCTION_KEY'],
+      aab: lane_context[SharedValues::GRADLE_AAB_OUTPUT_PATH],
+      skip_upload_metadata: true,
+      skip_upload_images: true,
+      skip_upload_screenshots: true,
+      release_status: "draft"
+    )
+
+    # Create Git tag
+    version_name = get_version_name
+    add_git_tag(tag: "v#{version_name}")
+    push_git_tags
+
+    # Generate audit report
+    generate_deployment_audit_report
+
+    # Notify stakeholders
+    notify_deployment_complete
+  end
+
+  # Helper methods
+  private
+
+  def verify_required_env_vars(vars)
+    vars.each do |var|
+      UI.user_error!("Missing required environment variable: #{var}") unless ENV[var]
+    end
+  end
+
+  def validate_build_artifacts(environment)
+    aab_path = lane_context[SharedValues::GRADLE_AAB_OUTPUT_PATH]
+    UI.user_error!("AAB file not found") unless File.exist?(aab_path)
+    
+    # Validate bundle size
+    max_size = environment == "production" ? 150 : 200 # Size in MB
+    bundle_size = File.size(aab_path) / (1024 * 1024)
+    UI.user_error!("Bundle size exceeds #{max_size}MB") if bundle_size > max_size
+  end
+
+  def get_version_name
+    gradle(task: 'printVersionName', flags: '-q').strip
+  end
+
+  def increment_version_code
+    gradle(
+      task: "incrementVersionCode",
+      flags: "-q"
+    )
+  end
+
+  def backup_build_artifacts
+    sh "mkdir -p ./builds/#{get_version_name}"
+    sh "cp #{lane_context[SharedValues::GRADLE_AAB_OUTPUT_PATH]} ./builds/#{get_version_name}/"
+  end
+
+  def monitor_staging_deployment
+    # Implementation for monitoring staging deployment
+    # Add specific monitoring logic here
+  end
+
+  def generate_changelog
+    # Implementation for changelog generation
+    # Add specific changelog logic here
+  end
+
+  def backup_production_version
+    # Implementation for backing up production version
+    # Add specific backup logic here
+  end
+
+  def generate_deployment_audit_report
+    # Implementation for audit report generation
+    # Add specific audit logic here
+  end
+
+  def notify_deployment_complete
+    # Implementation for deployment notification
+    # Add specific notification logic here
+  end
+
+  def notify_error(exception, context, webhook_url)
+    # Implementation for error notification
+    # Add specific error handling logic here
+  end
+end
