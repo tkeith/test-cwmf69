@@ -1,0 +1,229 @@
+name: Android CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'src/android/**'
+      - '.github/workflows/android.yml'
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - 'src/android/**'
+
+env:
+  JAVA_VERSION: '17'
+  RUBY_VERSION: '3.2'
+  GRADLE_VERSION: '8.0'
+  ANDROID_SDK_VERSION: '33'
+  GRADLE_BUILD_ACTION_CACHE_KEY_PREFIX: 'gradle-android'
+  GRADLE_BUILD_CACHE_DIR: '~/.gradle/caches'
+
+jobs:
+  validate:
+    name: Code Validation
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: ${{ env.JAVA_VERSION }}
+          cache: 'gradle'
+      
+      - name: Cache Gradle dependencies
+        uses: actions/cache@v3
+        with:
+          path: |
+            ${{ env.GRADLE_BUILD_CACHE_DIR }}
+            ~/.gradle/wrapper
+          key: ${{ env.GRADLE_BUILD_ACTION_CACHE_KEY_PREFIX }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: ${{ env.GRADLE_BUILD_ACTION_CACHE_KEY_PREFIX }}-
+      
+      - name: Run ktlint
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: ktlintCheck
+      
+      - name: Run detekt
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: detekt
+      
+      - name: Verify dependencies
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: dependencyUpdates
+      
+      - name: Security scan
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: dependencyCheckAnalyze
+
+  test:
+    name: Run Tests
+    needs: validate
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: ${{ env.JAVA_VERSION }}
+          cache: 'gradle'
+      
+      - name: Run unit tests
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: testDebugUnitTest
+      
+      - name: Run instrumentation tests
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: connectedDebugAndroidTest
+      
+      - name: Upload test results
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-results
+          path: |
+            **/build/reports/tests/
+            **/build/reports/androidTests/
+          retention-days: 14
+
+  build:
+    name: Build App
+    needs: test
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: ${{ env.JAVA_VERSION }}
+          cache: 'gradle'
+      
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: ${{ env.RUBY_VERSION }}
+          bundler-cache: true
+      
+      - name: Decode Keystore
+        env:
+          KEYSTORE_FILE: ${{ secrets.KEYSTORE_FILE }}
+        run: |
+          echo "$KEYSTORE_FILE" | base64 -d > android-keystore.jks
+      
+      - name: Build debug variant
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: assembleDebug
+      
+      - name: Build release variant
+        uses: gradle/gradle-build-action@v2
+        env:
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        with:
+          arguments: bundleRelease
+          properties: |
+            android.injected.signing.store.file=../android-keystore.jks
+            android.injected.signing.store.password=${{ env.KEYSTORE_PASSWORD }}
+            android.injected.signing.key.alias=${{ env.KEY_ALIAS }}
+            android.injected.signing.key.password=${{ env.KEY_PASSWORD }}
+      
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: app-bundles
+          path: |
+            **/build/outputs/bundle/release/
+            **/build/outputs/apk/debug/
+          retention-days: 14
+
+  deploy-staging:
+    name: Deploy to Staging
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment:
+      name: staging
+      url: https://firebase.google.com
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: ${{ env.RUBY_VERSION }}
+          bundler-cache: true
+      
+      - name: Download artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: app-bundles
+      
+      - name: Deploy to Firebase
+        env:
+          FIREBASE_APP_ID: ${{ secrets.FIREBASE_APP_ID }}
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+        run: |
+          bundle exec fastlane android deploy_staging
+
+  deploy-production:
+    name: Deploy to Production
+    needs: deploy-staging
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment:
+      name: production
+      url: https://play.google.com/store
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: ${{ env.RUBY_VERSION }}
+          bundler-cache: true
+      
+      - name: Download artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: app-bundles
+      
+      - name: Deploy to Play Store
+        env:
+          PLAY_STORE_JSON_KEY: ${{ secrets.PLAY_STORE_JSON_KEY }}
+        run: |
+          bundle exec fastlane android deploy_production
+      
+      - name: Create Release Tag
+        if: github.ref == 'refs/heads/main'
+        run: |
+          VERSION=$(bundle exec fastlane run get_version_name)
+          git tag -a "v${VERSION}" -m "Release version ${VERSION}"
+          git push origin "v${VERSION}"
