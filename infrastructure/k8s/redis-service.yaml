@@ -1,0 +1,42 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-service
+  namespace: delayed-messaging
+  labels:
+    app: redis
+    component: queue-cache
+    tier: data
+    managed-by: kubernetes
+  annotations:
+    # Enable Prometheus metrics scraping
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "9121"
+    # Ensure service is only accessible within the cluster
+    service.beta.kubernetes.io/aws-load-balancer-internal: "true"
+
+spec:
+  # Use ClusterIP for internal-only access
+  type: ClusterIP
+  
+  # Select pods from redis deployment
+  selector:
+    app: redis
+    component: queue-cache
+  
+  # Define ports for Redis and metrics
+  ports:
+    - name: redis
+      port: 6379
+      targetPort: 6379
+      protocol: TCP
+    - name: metrics
+      port: 9121
+      targetPort: 9121
+      protocol: TCP
+  
+  # Enable session affinity for stable connections
+  sessionAffinity: ClientIP
+  sessionAffinityConfig:
+    clientIP:
+      timeoutSeconds: 10800 # 3 hour timeout
