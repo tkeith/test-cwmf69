@@ -28,7 +28,7 @@
   },
   "dependencies": {
     "@aws-sdk/client-kms": "^3.0.0",
-    "@prisma/client": "4.x",
+    "@prisma/client": "6.x",
     "@sendgrid/mail": "^7.7.0",
     "apn": "^2.2.0",
     "argon2": "^0.30.0",
